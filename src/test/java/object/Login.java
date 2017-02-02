@@ -132,31 +132,6 @@ public class Login extends TestBase {
         }
     }
 
-    public String getWeHaneJustMessage() {
-        if (waitElementPresent(driver, MESSAGE_WE_HAVE_JUST.by(), wait)) {
-            return getText(driver, MESSAGE_WE_HAVE_JUST.by());
-        } else {
-            return "";
-        }
-    }
-
-    public String getGoToMailboxMessage() {
-        if (waitElementPresent(driver, MESSAGE_GO_TO_MAILBOX.by(), wait)) {
-            return getText(driver, MESSAGE_GO_TO_MAILBOX.by());
-        } else {
-            return "";
-        }
-    }
-
-    public String getIncorrectEmailMessage() {
-        String s = getText(driver, MESSAGE_INCORRECT_EMAIL.by()).trim();
-        if (waitElementPresent(driver, MESSAGE_INCORRECT_EMAIL.by(), wait)) {
-            return getText(driver, MESSAGE_INCORRECT_EMAIL.by());
-        } else {
-            return "";
-        }
-    }
-
     public boolean elementDisabled(By s){
         String disabled = "x-btn  x-btn-text-icon x-item-disabled";
         String element = getAttribute(driver,SIGNUP_BUTTON.by(),"class").trim();

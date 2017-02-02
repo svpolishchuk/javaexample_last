@@ -47,10 +47,6 @@ public enum  LoginPage {
         this.type = type;
     }
 
-    public String text() {
-        return text;
-    }
-
     public By by() {
         if (type == TypeLocator.CSS) {
             return By.cssSelector(path);
