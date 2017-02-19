@@ -1,8 +1,8 @@
 import object.Login;
+import object.RegistrationUser;
 import org.junit.Test;
 
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertEquals;
@@ -28,11 +28,13 @@ public class Registration extends TestBase {
 
         @Test
         public void CreateNewUser() {
-            driver.get("https://app.demo.jelastic.com/");
-            wait.until(titleIs("Jelastic administration panel"));
+            driver.get("https://exmo.com/ru/");
+            wait.until(titleIs("Eхmо.com | Биржа криптовалют. Купить и продать BTC, ETH, DOGE, LTC"));
 
-            Login user = new Login(driver,wait);
-            user.clickSubmenu();
+            RegistrationUser user = new RegistrationUser(driver,wait);
+            user.typeLogin("qwer");
+
+
             user.clickResetPassword();
             assertEquals(ifYourHaveForgottenMessage,user.getMessage(MESSAGE_IF_YOUR_HAVE_FORGOTTEN.by()));
             user.clickCancelButton();
