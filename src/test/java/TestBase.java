@@ -32,7 +32,7 @@ public class TestBase {
         options.addArguments("start-maximized");
         driver = new ChromeDriver(options);
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-        wait = new WebDriverWait(driver, 10);
+        wait = new WebDriverWait(driver, 20);
 
         Runtime.getRuntime().addShutdownHook(
                 new Thread (() -> {driver.quit(); driver = null; }));

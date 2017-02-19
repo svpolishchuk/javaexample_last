@@ -3,14 +3,14 @@ package object;
 import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.*;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.titleIs;
@@ -38,12 +38,23 @@ public class TestBase {
                 new Thread (() -> {driver.quit(); driver = null; }));
     }
 
-    boolean areElementsPresent(WebDriver driver, By locator) {
+   public static boolean isElementPresent(final WebDriver driver, By locator) {
+        try {
+            driver.findElement(locator);
+            return true;
+        }
+        catch( NoSuchElementException ex){
+            return false;
+        }
+    }
+
+    public boolean areElementsPresent(WebDriver driver, By locator) {
         if (driver.findElements(locator).size() == 1) {
             return true;
         }
         else return false;
     }
+
     public static boolean waitElementPresent(final WebDriver driver, final By locator, final WebDriverWait wait) {
         try {
             wait.until(ExpectedConditions.visibilityOf(getElement(driver, locator)));

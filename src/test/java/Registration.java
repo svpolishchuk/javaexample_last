@@ -1,90 +1,115 @@
-import object.Login;
 import object.RegistrationUser;
 import org.junit.Test;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.WebElement;
 
-import java.util.Set;
-
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
-import static maps.LoginPage.*;
+import static maps.RegistrationPage.*;
+import static object.TestBase.getElement;
+import static object.TestBase.getText;
+import static object.TestBase.isElementPresent;
+import static org.openqa.selenium.support.ui.ExpectedConditions.alertIsPresent;
 import static org.openqa.selenium.support.ui.ExpectedConditions.titleIs;
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertTrue;
 
 /**
  * Created by polis on 31.01.2017.
  */
 public class Registration extends TestBase {
 
-        private String tirmOfService = "http://jelastic.com/terms/";
-        private String privacyPolicy = "http://jelastic.com/policy/";
-
-        private String noCoreectEmail = "polishchuk";
-        private String coreectEmail = "polishchuk_sv@ukr.net";
-
-        private String noCoreectPassword = "pol";
-        private String coreectPassword = "vjSvmFlhAH";
-
-        private String ifYourHaveForgottenMessage = "If you have forgotten your password, we can send a new password to the email address registered with your account.";
+        private String login = "tyusqwerty";
+        private String email = "tyusqwerty@mail.ru";
+        private String password = "1234567";
+        private String passwordConfirmation = "1234567";
 
         @Test
         public void CreateNewUser() {
+            start();
             driver.get("https://exmo.com/ru/");
             wait.until(titleIs("Eхmо.com | Биржа криптовалют. Купить и продать BTC, ETH, DOGE, LTC"));
+            wait.until(visibilityOf(getElement(driver,START.by())));
 
-            RegistrationUser user = new RegistrationUser(driver,wait);
-            user.typeLogin("qwer");
+            RegistrationUser user = new RegistrationUser(driver, wait);
+            user.clickStartButton();
+            assertTrue(isElementPresent(driver, REGISTRATION_BUTTON.by()));
+            user.elementDisabled(REGISTRATION_BUTTON.by());
+            user.inputFieldEmpty(LOGIN.by());
+            user.inputFieldEmpty(EMAIL.by());
+            user.inputFieldEmpty(PASSWORD.by());
+            user.inputFieldEmpty(PASSWORD_CONFIRMATION.by());
 
+            // verification form with empty fields or any field
+            user.clickRegistrationButton();
+            assertTrue(isElementPresent(driver, LOGIN_ERROR_MESSAGE.by()));
+            assertTrue(isElementPresent(driver, EMAIL_ERROR_MESSAGE.by()));
+            assertTrue(isElementPresent(driver, PASSWORD_ERROR_MESSAGE.by()));
+            assertTrue(isElementPresent(driver, PASSWORD_CONFIRMATION_ERROR_MESSAGE.by()));
 
-            user.clickResetPassword();
-            assertEquals(ifYourHaveForgottenMessage,user.getMessage(MESSAGE_IF_YOUR_HAVE_FORGOTTEN.by()));
-            user.clickCancelButton();
+            user.typeLogin(login);
+            user.clickRegistrationButton();
+            assertFalse(isElementPresent(driver, LOGIN_ERROR_MESSAGE.by()));
+            assertTrue(isElementPresent(driver, EMAIL_ERROR_MESSAGE.by()));
+            assertTrue(isElementPresent(driver, PASSWORD_ERROR_MESSAGE.by()));
+            assertTrue(isElementPresent(driver, PASSWORD_CONFIRMATION_ERROR_MESSAGE.by()));
 
-            user.clickSubmenu();
-            String originalWindow = driver.getWindowHandle();
-            Set<String> oldWindows = driver.getWindowHandles();
-            user.clickGoToComunity();
-            String newWindow = wait.until(user.anyWindowOtherThen(oldWindows));
-            user.OpenWindow(newWindow);
-            wait.until(titleIs("Newest 'jelastic' Questions - Stack Overflow"));
-            user.CloseWindow();
-            user.OpenWindow(originalWindow);
+            user.typeEmail(email);
+            user.clickRegistrationButton();
+            assertFalse(isElementPresent(driver, LOGIN_ERROR_MESSAGE.by()));
+            assertFalse(isElementPresent(driver, EMAIL_ERROR_MESSAGE.by()));
+            assertTrue(isElementPresent(driver, PASSWORD_ERROR_MESSAGE.by()));
+            assertTrue(isElementPresent(driver, PASSWORD_CONFIRMATION_ERROR_MESSAGE.by()));
 
-            user.clickSubmenu();
-            user.clickSIgnUp();
+            user.typePassword(password);
+            user.clickRegistrationButton();
+            assertFalse(isElementPresent(driver, LOGIN_ERROR_MESSAGE.by()));
+            assertFalse(isElementPresent(driver, EMAIL_ERROR_MESSAGE.by()));
+            assertFalse(isElementPresent(driver, PASSWORD_ERROR_MESSAGE.by()));
+            assertTrue(isElementPresent(driver, PASSWORD_CONFIRMATION_ERROR_MESSAGE.by()));
 
-            assertEquals("Sign Up for Free!", user.getSuccessMessage().trim());
-            assertEquals(privacyPolicy, user.getLinkPrivacyPolicy().trim());
-            assertEquals(tirmOfService, user.getLinkTermsOfService().trim());
-            assertTrue("Element 'BUTTON SIGN_UP' Enabled",user.elementDisabled(SIGNUP_BUTTON.by()));
+            user.typePasswordConfirmation(passwordConfirmation);
+            user.clickRegistrationButton();
+            assertFalse(isElementPresent(driver, LOGIN_ERROR_MESSAGE.by()));
+            assertFalse(isElementPresent(driver, EMAIL_ERROR_MESSAGE.by()));
+            assertFalse(isElementPresent(driver, PASSWORD_ERROR_MESSAGE.by()));
+            assertFalse(isElementPresent(driver, PASSWORD_CONFIRMATION_ERROR_MESSAGE.by()));
 
-            user.typeEmail(noCoreectEmail);
-            assertTrue("Element 'BUTTON SIGN_UP' Enabled",user.elementDisabled(SIGNUP_BUTTON.by()));
-            user.typeEmail(coreectEmail);
-            assertFalse("Element 'BUTTON SIGN_UP' Disabled",user.elementDisabled(SIGNUP_BUTTON.by()));
+            user.clearField(driver, LOGIN.by());
+            user.clickRegistrationButton();
+            assertTrue(isElementPresent(driver, LOGIN_ERROR_MESSAGE.by()));
+            assertFalse(isElementPresent(driver, EMAIL_ERROR_MESSAGE.by()));
+            assertFalse(isElementPresent(driver, PASSWORD_ERROR_MESSAGE.by()));
+            assertFalse(isElementPresent(driver, PASSWORD_CONFIRMATION_ERROR_MESSAGE.by()));
 
-            user.clickSIgnUpButton();
-            wait.until(titleIs("Jelastic administration panel"));
-            user.typePassword(noCoreectPassword);
-            user.clickLogin();
-            user.clickLincYouMayRessetYourPassword();
-            assertEquals(ifYourHaveForgottenMessage,user.getMessage(MESSAGE_IF_YOUR_HAVE_FORGOTTEN_NEXT_ONE.by()));
-            user.clickRecoverButton();
-            assertEquals("A new password has been emailed to the address you provided.",user.getMessage(MESSAGE_NEW_PASSWORD_EMAILED.by()));
+            // verification form with all filled fields
+            user.clearField(driver, LOGIN.by());
+            user.clearField(driver, EMAIL.by());
+            user.clearField(driver, PASSWORD.by());
+            user.clearField(driver, PASSWORD_CONFIRMATION.by());
+
+            user.typeLogin(login);
+            user.typeEmail(email);
+            user.typePassword(password);
+            user.typePasswordConfirmation(passwordConfirmation);
+            user.click(driver,CHECKBOX_AGREE.by());
+            user.clickRegistrationButton();
+            wait.until(titleIs("Защищенный кошелек"));
+
+            //validation pass registration
+            user.click(driver, LOGOUT.by());
+            Alert alert = wait.until(alertIsPresent());
+            alert.dismiss();
+            wait.until(titleIs("Защищенный кошелек"));
+            user.click(driver, LOGOUT.by());
+            Alert alert1 = wait.until(alertIsPresent());
+            alert1.accept();
+            wait.until(titleIs("Eхmо.com | Биржа криптовалют. Купить и продать BTC, ETH, DOGE, LTC"));
+            user.click(driver, LOGIN.by());
+            user.typeText(driver, LOGIN_EMAIL.by(), email);
+            user.typeText(driver, LOGIN_PASSWORD.by(), password);
+            user.click(driver, LOGIN.by());
+            wait.until(titleIs("Защищенный кошелек"));
+
+            stop();
         }
-
-        @Test
-        public  void VerificationNewUser(){
-            driver.get("https://app.demo.jelastic.com/");
-            wait.until(titleIs("Jelastic administration panel"));
-
-            Login user = new Login(driver,wait);
-            user.typeEmail(coreectEmail);
-            user.typePassword(coreectPassword);
-            user.clickLogin();
-            wait.until(titleIs("Jelastic administration panel"));
-            user.clickUserButton();
-            user.clickSignOutButton();
-            wait.until(titleIs("Jelastic administration panel"));
-        }
-
 }
